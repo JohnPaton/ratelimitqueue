@@ -5,6 +5,7 @@ from ratelimitqueue import utils
 
 from .utils import almost
 
+
 class TestGetTimeRemaining:
     def test_timeout_none(self):
         assert utils.get_time_remaining(0, None) is None

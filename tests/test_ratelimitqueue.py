@@ -15,6 +15,7 @@ import random
 # take randomness out of fuzzing
 random.uniform = mock.MagicMock(return_value=0.5)
 
+
 class PutMixinTester:
     # tests of __init__()
     def test_no_per(self):
@@ -66,7 +67,7 @@ class PutMixinTester:
         start = time.time()
         rlq.put(1)
 
-        assert almost(0, time.time()-start)
+        assert almost(0, time.time() - start)
 
     def test_default_rate_limit(self):
         rlq = self.QueueClass()
@@ -75,7 +76,7 @@ class PutMixinTester:
         rlq.put(1)
         rlq.put(1)
 
-        assert almost(1, time.time()-start)
+        assert almost(1, time.time() - start)
 
     def test_rate_limit_calls(self):
         rlq = self.QueueClass(calls=2)
@@ -146,7 +147,7 @@ class PutMixinTester:
         with pytest.raises(Full):
             start = time.time()
             rlq.put(1, timeout=0.5)
-            assert almost(0.5, time.time()-start)
+            assert almost(0.5, time.time() - start)
 
     def test_no_fuzz_when_at_rate_limit(self):
         rlq = self.QueueClass(per=0.5)
@@ -156,15 +157,15 @@ class PutMixinTester:
 
         start = time.time()
         rlq.put(1)
-        assert almost(0.5, time.time()-start)
+        assert almost(0.5, time.time() - start)
 
     def test_fuzz(self):
         rlq = self.QueueClass(per=0.5, fuzz=1)
         start = time.time()
         rlq.put(1)
         end = time.time()
-        assert not almost(0, end-start)
-        assert end-start < 1
+        assert not almost(0, end - start)
+        assert end - start < 1
 
     def test_fuzz_less_than_timeout(self):
         rlq = self.QueueClass(fuzz=10000)
@@ -185,6 +186,7 @@ class TestRateLimitQueue(PutMixinTester):
         assert rlq.get() == 1
         assert rlq.get() == 2
 
+
 class TestRateLimitLifoQueue(PutMixinTester):
     QueueClass = RateLimitLifoQueue
 
@@ -202,12 +204,12 @@ class TestRateLimitPriorityQueue(PutMixinTester):
     def test_priority(self):
         rlq = self.QueueClass(per=0)
 
-        rlq.put((4, 'fourth'))
-        rlq.put((2, 'second'))
-        rlq.put((1, 'first'))
-        rlq.put((3, 'third'))
+        rlq.put((4, "fourth"))
+        rlq.put((2, "second"))
+        rlq.put((1, "first"))
+        rlq.put((3, "third"))
 
-        assert rlq.get() == (1, 'first')
-        assert rlq.get() == (2, 'second')
-        assert rlq.get() == (3, 'third')
-        assert rlq.get() == (4, 'fourth')
+        assert rlq.get() == (1, "first")
+        assert rlq.get() == (2, "second")
+        assert rlq.get() == (3, "third")
+        assert rlq.get() == (4, "fourth")

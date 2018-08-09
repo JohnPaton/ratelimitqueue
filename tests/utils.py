@@ -18,4 +18,4 @@ def almost(a, b, threshold=0.01):
     -------
     bool
     """
-    return math.fabs(a-b) < threshold
+    return math.fabs(a - b) < threshold

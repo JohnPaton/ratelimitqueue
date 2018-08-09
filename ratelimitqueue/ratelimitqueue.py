@@ -14,6 +14,7 @@ class RateLimitPutMixin:
     `fuzz` (float), and `_call_log` (queue.Queue), else will raise
     AttributeError on call of put().
     """
+
     def put(self, item, block=True, timeout=None):
         """
         Put an item into the queue.
@@ -48,21 +49,21 @@ class RateLimitPutMixin:
         if timeout is not None and timeout < 0:
             raise ValueError("`timeout` must be a non-negative number")
 
-        if not hasattr(self, 'per'):
-            raise AttributeError('RateLimitPut requires the `.per` property')
+        if not hasattr(self, "per"):
+            raise AttributeError("RateLimitPut requires the `.per` property")
 
-        if not hasattr(self, 'fuzz'):
-            raise AttributeError('RateLimitPut requires the `.fuzz` property')
+        if not hasattr(self, "fuzz"):
+            raise AttributeError("RateLimitPut requires the `.fuzz` property")
 
-        if not hasattr(self, '_call_log'):
+        if not hasattr(self, "_call_log"):
             raise AttributeError(
-                'RateLimitPut requires the `._call_log` Queue'
+                "RateLimitPut requires the `._call_log` Queue"
             )
 
-        if not hasattr(super(), 'put'):
+        if not hasattr(super(), "put"):
             raise AttributeError(
-                'RateLimitPut must be mixed into a base class with'
-                ' the `.put()` method'
+                "RateLimitPut must be mixed into a base class with"
+                " the `.put()` method"
             )
 
         # get snapshot of properties so no need to lock
@@ -84,17 +85,19 @@ class RateLimitPutMixin:
                     sleep_time = per - time_since_call
 
                     # not enough time to sleep
-                    if time_remaining is not None \
-                            and time_remaining < sleep_time:
+                    if (
+                        time_remaining is not None
+                        and time_remaining < sleep_time
+                    ):
                         raise RateLimitException(
-                            'Not enough time in timeout to wait for next slot'
+                            "Not enough time in timeout to wait for next slot"
                         )
 
                     time.sleep(sleep_time)
 
                 # too fast but not blocking -> exception
                 else:
-                    raise RateLimitException('Too many requests')
+                    raise RateLimitException("Too many requests")
 
         elif fuzz > 0:
             time_remaining = get_time_remaining(start, timeout)
@@ -103,7 +106,7 @@ class RateLimitPutMixin:
             if time_remaining is not None:
                 # leave a bit of leeway from time_remaining to not
                 # time out due to fuzzing
-                fuzz_time = min(fuzz_time, time_remaining-0.01)
+                fuzz_time = min(fuzz_time, time_remaining - 0.01)
 
             time.sleep(fuzz_time)
 
@@ -181,7 +184,7 @@ class RateLimitQueue(RateLimitPutMixin, queue.Queue):
 
         """
         if calls < 1:
-            raise ValueError('`calls` must be an integer >= 1')
+            raise ValueError("`calls` must be an integer >= 1")
 
         super().__init__(maxsize)
         self.calls = int(calls)
@@ -253,7 +256,7 @@ class RateLimitLifoQueue(RateLimitPutMixin, queue.LifoQueue):
 
         """
         if calls < 1:
-            raise ValueError('`calls` must be an integer >= 1')
+            raise ValueError("`calls` must be an integer >= 1")
 
         super().__init__(maxsize)
         self.calls = int(calls)
@@ -330,7 +333,7 @@ class RateLimitPriorityQueue(RateLimitPutMixin, queue.PriorityQueue):
 
         """
         if calls < 1:
-            raise ValueError('`calls` must be an integer >= 1')
+            raise ValueError("`calls` must be an integer >= 1")
 
         super().__init__(maxsize)
         self.calls = int(calls)
@@ -338,5 +341,3 @@ class RateLimitPriorityQueue(RateLimitPutMixin, queue.PriorityQueue):
         self.fuzz = float(fuzz)
 
         self._call_log = queue.Queue(maxsize=self.calls)
-
-
