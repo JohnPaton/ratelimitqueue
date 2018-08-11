@@ -1,0 +1,22 @@
+---
+language: python
+python:
+  - 3.4
+  - 3.5
+  - 3.6
+install:
+  - pip3 install -r requirements.txt
+  - pip3 install pytest
+  - pip3 install -e .
+script: py.test -l
+# from https://github.com/farrokhi/dnsdiag/blob/master/.travis.yml
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
+    - python: 3.8-dev
+      dist: xenial
+      sudo: true
+
+

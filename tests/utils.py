@@ -1,7 +1,7 @@
 import math
 
 
-def almost(a, b, threshold=0.01):
+def almost(a, b, threshold=0.05):
     """
     Test whether `a` and `b` within `threshold` of each other.
 
