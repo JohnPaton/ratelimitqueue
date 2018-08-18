@@ -1,11 +1,9 @@
 ratelimitqueue package
 ======================
 
-ratelimitqueue module
-------------------------------------
 
-Module contents
----------------
+Package Contents
+----------------
 
 .. autoclass:: ratelimitqueue.RateLimitQueue
     :members:
@@ -19,11 +17,12 @@ Module contents
     :members:
     :inherited-members:
 
+
 Submodules
 ----------
 
 ratelimitqueue.exceptions module
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: ratelimitqueue.exceptions
     :members:
@@ -31,7 +30,7 @@ ratelimitqueue.exceptions module
     :show-inheritance:
 
 ratelimitqueue.ratelimitqueue module
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: ratelimitqueue.ratelimitqueue.RateLimitPutMixin
     :members:
