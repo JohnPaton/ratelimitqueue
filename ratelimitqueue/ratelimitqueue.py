@@ -158,29 +158,35 @@ class RateLimitQueue(RateLimitPutMixin, queue.Queue):
 
         Examples
         --------
+
         Basic usage:
-        >>> rlq = RateLimitQueue()
-        >>> rlq.put(1)
-        >>> rlq.put(2)
-        >>> rlq.get()
-        1
-        >>> rlq.get()
-        2
+
+            >>> rlq = RateLimitQueue()
+            >>> rlq.put(1)
+            >>> rlq.put(2)
+            >>> rlq.get()
+            1
+            >>> rlq.get()
+            2
 
         A rate limit of 3 calls per 5 seconds:
-        >>> rlq = RateLimitQueue(calls=3, per=5)
+
+            >>> rlq = RateLimitQueue(calls=3, per=5)
 
         A queue with the default 1 call per second, with a maximum size
         of 3:
-        >>> rlq = RateLimitQueue(3)
+
+            >>> rlq = RateLimitQueue(3)
 
         A queue of infinite size and rate limit, equivalent to
         queue.Queue():
-        >>> rlq = RateLimitQueue(per=0)
+
+            >>> rlq = RateLimitQueue(per=0)
 
         A queue with wait time fuzzing up to 1 second so that the queue
         cannot be filled immediately directly after instantiation:
-        >>> rlq = RateLimitQueue(fuzz=1)
+
+            >>> rlq = RateLimitQueue(fuzz=1)
 
         """
         if calls < 1:
@@ -231,28 +237,33 @@ class RateLimitLifoQueue(RateLimitPutMixin, queue.LifoQueue):
         Examples
         --------
         Basic usage:
-        >>> rlq = RateLimitLifoQueue()
-        >>> rlq.put(1)
-        >>> rlq.put(2)
-        >>> rlq.get()
-        2
-        >>> rlq.get()
-        1
+
+            >>> rlq = RateLimitLifoQueue()
+            >>> rlq.put(1)
+            >>> rlq.put(2)
+            >>> rlq.get()
+            2
+            >>> rlq.get()
+            1
 
         A rate limit of 3 calls per 5 seconds:
-        >>> rlq = RateLimitLifoQueue(calls=3, per=5)
+
+            >>> rlq = RateLimitLifoQueue(calls=3, per=5)
 
         A queue with the default 1 call per second, with a maximum size
         of 3:
-        >>> rlq = RateLimitLifoQueue(3)
+
+            >>> rlq = RateLimitLifoQueue(3)
 
         A queue of infinite size and rate limit, equivalent to
         queue.Queue():
-        >>> rlq = RateLimitLifoQueue(per=0)
+
+            >>> rlq = RateLimitLifoQueue(per=0)
 
         A queue with wait time fuzzing up to 1 second so that the queue
         cannot be filled immediately directly after instantiation:
-        >>> rlq = RateLimitLifoQueue(fuzz=1)
+
+            >>> rlq = RateLimitLifoQueue(fuzz=1)
 
         """
         if calls < 1:
@@ -307,29 +318,35 @@ class RateLimitPriorityQueue(RateLimitPutMixin, queue.PriorityQueue):
 
         Examples
         --------
+
         Basic usage:
-        >>> rlq = RateLimitPriorityQueue()
-        >>> rlq.put((2, 'second'))
-        >>> rlq.put((1, 'first'))
-        >>> rlq.get()
-        (1, 'first')
-        >>> rlq.get()
-        (2, 'second')
+
+            >>> rlq = RateLimitPriorityQueue()
+            >>> rlq.put((2, 'second'))
+            >>> rlq.put((1, 'first'))
+            >>> rlq.get()
+            (1, 'first')
+            >>> rlq.get()
+            (2, 'second')
 
         A rate limit of 3 calls per 5 seconds:
-        >>> rlq = RateLimitPriorityQueue(calls=3, per=5)
+
+            >>> rlq = RateLimitPriorityQueue(calls=3, per=5)
 
         A queue with the default 1 call per second, with a maximum size
         of 3:
-        >>> rlq = RateLimitPriorityQueue(3)
+
+            >>> rlq = RateLimitPriorityQueue(3)
 
         A queue of infinite size and rate limit, equivalent to
         queue.Queue():
-        >>> rlq = RateLimitPriorityQueue(per=0)
+
+            >>> rlq = RateLimitPriorityQueue(per=0)
 
         A queue with wait time fuzzing up to 1 second so that the queue
         cannot be filled immediately directly after instantiation:
-        >>> rlq = RateLimitPriorityQueue(fuzz=1)
+
+            >>> rlq = RateLimitPriorityQueue(fuzz=1)
 
         """
         if calls < 1:
