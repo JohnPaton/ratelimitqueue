@@ -16,6 +16,4 @@ matrix:
     - python: 3.7
       dist: xenial
       sudo: true
-    - python: 3.6
-      install: pip install -r requirements.txt -e .
-      script: coveralls
+      script: py.test -l --cov=nbviewerbot && coveralls
