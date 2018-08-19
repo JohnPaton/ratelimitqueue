@@ -16,4 +16,6 @@ matrix:
     - python: 3.7
       dist: xenial
       sudo: true
-      script: py.test -l --cov=nbviewerbot && coveralls
+      script: 
+        - py.test -l --cov=ratelimitqueue 
+        - coveralls
