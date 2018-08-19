@@ -32,7 +32,7 @@ ratelimitqueue.exceptions module
 ratelimitqueue.ratelimitqueue module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: ratelimitqueue.ratelimitqueue.RateLimitPutMixin
+.. autoclass:: ratelimitqueue.ratelimitqueue.RateLimitGetMixin
     :members:
 
 

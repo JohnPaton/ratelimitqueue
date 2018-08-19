@@ -2,78 +2,62 @@ import time
 import random
 
 import queue
+import multiprocessing.dummy as mp
 
 from .exceptions import RateLimitException
 from .utils import get_time_remaining
 
 
-class RateLimitPutMixin:
-    """Adds rate limiting to another class' `put()` method.
+class RateLimitGetMixin:
+    """Adds rate limiting to another class' `get()` method.
 
     Assumes that the class being extended has properties `per` (float),
     `fuzz` (float), and `_call_log` (queue.Queue), else will raise
     AttributeError on call of put().
     """
 
-    def put(self, item, block=True, timeout=None):
+    def get(self, block=True, timeout=None):
         """
-        Put an item into the queue.
+        Get an item from the queue.
 
         If optional args `block` is True and `timeout` is None (the default),
         block if necessary until a free slot is available and the rate limit
         has not been reached. If `timeout` is a non-negative number, it blocks
         at most `timeout` seconds and raises the RateLimitException if
         the required rate limit waiting time is shorter than the given timeout,
-        or the Full exception if no free slot was available within that time.
+        or the Empty exception if no item was available within that time.
 
-        Otherwise (`block` is False), put an item on the queue if a free slot
+        Otherwise (`block` is False), get an item on the queue if an item
         is immediately available and the rate limit has not been hit. Else
         raise the RateLimitException if waiting on the rate limit, or
-        Full exception if there is no slot available in the queue. Timeout
+        Empty exception if there is no item available in the queue. Timeout
         is ignored in this case.
 
         Parameters
         ----------
-        item : obj
-            The object to put in the queue
-
         block : bool, optional, default True
-            Whether to block until the item can be put into the queue
+            Whether to block until an item can be gotten from the queue
 
         timeout : float, optional, default None
             The maximum amount of time to block for
 
         """
         start = time.time()
+        self._pending_get.acquire(block, timeout if block else None)
 
         if timeout is not None and timeout < 0:
             raise ValueError("`timeout` must be a non-negative number")
 
-        if not hasattr(self, "per"):
-            raise AttributeError("RateLimitPut requires the `.per` property")
-
-        if not hasattr(self, "fuzz"):
-            raise AttributeError("RateLimitPut requires the `.fuzz` property")
-
-        if not hasattr(self, "_call_log"):
-            raise AttributeError(
-                "RateLimitPut requires the `._call_log` Queue"
-            )
-
-        if not hasattr(super(), "put"):
-            raise AttributeError(
-                "RateLimitPut must be mixed into a base class with"
-                " the `.put()` method"
-            )
+        # make sure child class has the required attributes
+        self._check_attributes()
 
         # get snapshot of properties so no need to lock
         per = self.per
         fuzz = self.fuzz
 
-        if self._call_log.full():
+        if self._call_log.qsize() >= self.calls:
             # get the earliest call in the queue
             first_call = self._call_log.get()
-            self._call_log.task_done()
 
             time_since_call = time.time() - first_call
 
@@ -89,6 +73,7 @@ class RateLimitPutMixin:
                         time_remaining is not None
                         and time_remaining < sleep_time
                     ):
+                        self._call_log.task_done()
                         raise RateLimitException(
                             "Not enough time in timeout to wait for next slot"
                         )
@@ -97,7 +82,10 @@ class RateLimitPutMixin:
 
                 # too fast but not blocking -> exception
                 else:
+                    self._call_log.task_done()
                     raise RateLimitException("Too many requests")
+
+            self._call_log.task_done()
 
         elif fuzz > 0:
             time_remaining = get_time_remaining(start, timeout)
@@ -116,13 +104,35 @@ class RateLimitPutMixin:
         if time_remaining is not None and time_remaining <= 0:
             raise TimeoutError
 
-        super().put(item, block, timeout=time_remaining)
-
-        # log the call
+        # log the call and return the next item
         self._call_log.put(time.time())
+        self._pending_get.release()
+        return super().get(block, timeout=time_remaining)
+
+    def _check_attributes(self):
+        if not hasattr(self, "per"):
+            raise AttributeError(
+                "RateLimitGetMixin requires the `.per` property"
+            )
+
+        if not hasattr(self, "fuzz"):
+            raise AttributeError(
+                "RateLimitGetMixin requires the `.fuzz` property"
+            )
+
+        if not hasattr(self, "_call_log"):
+            raise AttributeError(
+                "RateLimitGetMixin requires the `._call_log` Queue"
+            )
+
+        if not hasattr(super(), "put"):
+            raise AttributeError(
+                "RateLimitGetMixin must be mixed into a base class with"
+                " the `.get()` method"
+            )
 
 
-class RateLimitQueue(RateLimitPutMixin, queue.Queue):
+class RateLimitQueue(RateLimitGetMixin, queue.Queue):
     def __init__(self, maxsize=0, calls=1, per=1.0, fuzz=0):
         """
         A thread safe queue with a given maximum size and rate limit.
@@ -134,10 +144,10 @@ class RateLimitQueue(RateLimitPutMixin, queue.Queue):
         `per` measured in seconds. The default rate limit is 1 call per
         second. If `per` is <= 0, the rate limit is infinite.
 
-        To avoid immediately filling the whole queue at startup, an
+        To avoid immediately getting the maximum allowed items at startup, an
         extra randomized wait period can be configured with `fuzz`.
         This will cause the RateLimitQueue to wait between 0 and `fuzz`
-        seconds before putting the object in the queue. Fuzzing only
+        seconds before getting the object in the queue. Fuzzing only
         occurs if there is no rate limit waiting to be done.
 
         Parameters
@@ -198,9 +208,10 @@ class RateLimitQueue(RateLimitPutMixin, queue.Queue):
         self.fuzz = float(fuzz)
 
         self._call_log = queue.Queue(maxsize=self.calls)
+        self._pending_get = mp.Semaphore(1)
 
 
-class RateLimitLifoQueue(RateLimitPutMixin, queue.LifoQueue):
+class RateLimitLifoQueue(RateLimitGetMixin, queue.LifoQueue):
     def __init__(self, maxsize=0, calls=1, per=1.0, fuzz=0):
         """
         A thread safe LIFO queue with a given maximum size and rate limit.
@@ -275,9 +286,9 @@ class RateLimitLifoQueue(RateLimitPutMixin, queue.LifoQueue):
         self.fuzz = float(fuzz)
 
         self._call_log = queue.Queue(maxsize=self.calls)
+        self._pending_get = mp.Semaphore(1)
 
-
-class RateLimitPriorityQueue(RateLimitPutMixin, queue.PriorityQueue):
+class RateLimitPriorityQueue(RateLimitGetMixin, queue.PriorityQueue):
     def __init__(self, maxsize=0, calls=1, per=1.0, fuzz=0):
         """
         A thread safe priority queue with a given maximum size and rate
@@ -358,3 +369,4 @@ class RateLimitPriorityQueue(RateLimitPutMixin, queue.PriorityQueue):
         self.fuzz = float(fuzz)
 
         self._call_log = queue.Queue(maxsize=self.calls)
+        self._pending_get = mp.Semaphore(1)
