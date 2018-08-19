@@ -17,5 +17,5 @@ matrix:
       sudo: true
     - python: 3.6
       script:
-        - pytest --cov=ratelimitqueue
+        - pytest -l --cov=ratelimitqueue
         - coveralls
