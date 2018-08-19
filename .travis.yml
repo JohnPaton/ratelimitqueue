@@ -19,3 +19,10 @@ matrix:
       script:
         - pytest -l --cov=ratelimitqueue
         - coveralls
+
+deploy:
+  provider: pypi
+  user: johnpaton
+  password: $PYPI_PASSWORD
+  on:
+    branch: master
