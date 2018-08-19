@@ -11,12 +11,10 @@ The `ratelimitqueue` package extends the three built-in Python queues from from 
 
 ## Installation
 
-To get started, clone this repository and install it with `pip`:
+To get started, install it with `pip`:
 
 ```bash
-$ git clone https://github.com/JohnPaton/ratelimitqueue.git
-$ cd ratelimitqueue
-$ pip install .
+pip install ratelimitqueue
 ```
 
 <!-- ## Basic Usage

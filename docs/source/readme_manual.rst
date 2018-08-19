@@ -43,9 +43,7 @@ To install ``ratelimitqueue``, clone the repository and install with
 
 .. code:: bash
 
-   $ git clone https://github.com/JohnPaton/ratelimitqueue.git
-   $ cd ratelimitqueue
-   $ pip install .
+   pip install ratelimitqueue
 
 
 
