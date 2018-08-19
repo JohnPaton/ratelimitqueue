@@ -288,6 +288,7 @@ class RateLimitLifoQueue(RateLimitGetMixin, queue.LifoQueue):
         self._call_log = queue.Queue(maxsize=self.calls)
         self._pending_get = mp.Semaphore(1)
 
+
 class RateLimitPriorityQueue(RateLimitGetMixin, queue.PriorityQueue):
     def __init__(self, maxsize=0, calls=1, per=1.0, fuzz=0):
         """

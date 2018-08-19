@@ -13,7 +13,7 @@ import time
 import random
 
 # take randomness out of fuzzing
-random.uniform = mock.Mock(side_effect=lambda a, b: a + (b-a)/2)
+random.uniform = mock.Mock(side_effect=lambda a, b: a + (b - a) / 2)
 
 
 class GetMixinTester:
