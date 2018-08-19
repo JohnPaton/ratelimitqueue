@@ -6,7 +6,6 @@ python:
   - 3.6
 install:
   - pip3 install -r requirements.txt
-  - pip3 install pytest
   - pip3 install -e .
 script: py.test -l
 
@@ -16,6 +15,7 @@ matrix:
     - python: 3.7
       dist: xenial
       sudo: true
-      script: 
-        - py.test -l --cov=ratelimitqueue 
+    - python: 3.6
+      script:
+        - pytest --cov=ratelimitqueue
         - coveralls
