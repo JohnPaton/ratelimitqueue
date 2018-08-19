@@ -9,11 +9,13 @@ install:
   - pip3 install pytest
   - pip3 install -e .
 script: py.test -l
-# from https://github.com/farrokhi/dnsdiag/blob/master/.travis.yml
+
 matrix:
   include:
+      # from https://github.com/farrokhi/dnsdiag/blob/master/.travis.yml
     - python: 3.7
       dist: xenial
       sudo: true
-
-
+    - python: 3.6
+      install: pip install pytest coveralls -r requirements.txt -e .
+      script: coveralls
