@@ -22,4 +22,4 @@
 .. .. * :ref:`modindex`
 .. .. * :ref:`search`
 
-.. include:: ../../README.rst
+.. include:: readme_manual.rst
