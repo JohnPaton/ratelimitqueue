@@ -39,7 +39,6 @@ release = '0.1.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'm2r',
     'sphinx.ext.napoleon',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
@@ -182,9 +181,9 @@ napoleon_use_ivar = False
 napoleon_use_param = True
 napoleon_use_rtype = True
 
-# source_parsers = {
-#    '.md': 'recommonmark.parser.CommonMarkParser',
-# }
+source_parsers = {
+   '.md': 'recommonmark.parser.CommonMarkParser',
+}
 
 # -- Options for todo extension ----------------------------------------------
 
