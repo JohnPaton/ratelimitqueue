@@ -21,7 +21,7 @@ A thread safe, rate limited Python queue.
 Installation
 ------------
 
-To install ``ratelimitqueue``, close the repository and install with
+To install ``ratelimitqueue``, clone the repository and install with
 ``pip``:
 
 .. code:: bash

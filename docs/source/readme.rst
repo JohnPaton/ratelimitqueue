@@ -6,8 +6,6 @@ RateLimitQueue
 
 A thread safe, rate limited Python queue.
 
-https://ratelimitqueue.readthedocs.io
-
 Installation
 ------------
 
@@ -19,9 +17,6 @@ To install ``ratelimitqueue``, clone the repository and install with
    $ git clone https://github.com/JohnPaton/ratelimitqueue.git
    $ cd ratelimitqueue
    $ pip install .
-
-Getting Started
----------------
 
 .. |Build Status| image:: https://travis-ci.com/JohnPaton/ratelimitqueue.svg?branch=master
    :target: https://travis-ci.com/JohnPaton/ratelimitqueue
