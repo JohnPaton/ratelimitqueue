@@ -11,9 +11,9 @@ from . import utils
 class RateLimitGetMixin:
     """Adds rate limiting to another class' `get()` method.
 
-    Assumes that the class being extended has properties `per` (float),
-    `fuzz` (float), and `_call_log` (queue.Queue), else will raise
-    AttributeError on call of put().
+    Assumes that the class being extended has properties `calls` (int),
+    `per` (float), `fuzz` (float), and `_call_log` (queue.Queue), else will
+    raise AttributeError on call of get().
     """
 
     def get(self, block=True, timeout=None):
