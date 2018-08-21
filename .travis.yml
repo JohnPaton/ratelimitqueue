@@ -25,3 +25,4 @@ matrix:
         password: $PYPI_PASSWORD
         on:
           branch: master
+          tags: true
