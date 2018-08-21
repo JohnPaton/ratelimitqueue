@@ -1,5 +1,5 @@
-|Build Status| |Coverage Status| |Documentation Status| |Code style:
-black|
+|PyPI version| |Build Status| |Coverage Status| |Documentation Status|
+|Code style: black|
 
 RateLimitQueue
 ==============
@@ -38,6 +38,8 @@ To get started, install it with ``pip``:
 
    The most basic usage is to rate limit calls in the main thread -->
 
+.. |PyPI version| image:: https://badge.fury.io/py/ratelimitqueue.svg
+   :target: https://badge.fury.io/py/ratelimitqueue
 .. |Build Status| image:: https://travis-ci.com/JohnPaton/ratelimitqueue.svg?branch=master
 .. |Coverage Status| image:: https://coveralls.io/repos/github/JohnPaton/ratelimitqueue/badge.svg
    :target: https://coveralls.io/github/JohnPaton/ratelimitqueue

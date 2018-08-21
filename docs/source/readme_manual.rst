@@ -1,4 +1,4 @@
-|Build Status| |Coverage Status| |Documentation Status| |Code style:
+|PyPI version| |Build Status| |Coverage Status| |Documentation Status| |Code style:
 black|
 
 RateLimitQueue
@@ -47,7 +47,8 @@ To install ``ratelimitqueue``, clone the repository and install with
 
 
 
-
+.. |PyPI version| image:: https://badge.fury.io/py/ratelimitqueue.svg
+   :target: https://badge.fury.io/py/ratelimitqueue
 .. |Build Status| image:: https://travis-ci.com/JohnPaton/ratelimitqueue.svg?branch=master
    :target: https://travis-ci.com/JohnPaton/ratelimitqueue
 .. |Coverage Status| image:: https://coveralls.io/repos/github/JohnPaton/ratelimitqueue/badge.svg
