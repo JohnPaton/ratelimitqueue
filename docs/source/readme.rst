@@ -26,17 +26,60 @@ thread.
 Installation
 ------------
 
-To get started, install it with ``pip``:
+To get started, install ``ratelimitqueue`` with ``pip``:
 
 .. code:: bash
 
    pip install ratelimitqueue
 
-.. raw:: html
+Examples
+--------
 
-   <!-- ## Basic Usage
+The most basic usage is rate limiting calls in the main thread by
+pre-loading a ``RateLimitQueue``. For a rate limit of 2 calls per
+second:
 
-   The most basic usage is to rate limit calls in the main thread -->
+.. code:: python
+
+   rlq = ratelimitqueue.RateLimitQueue(calls=2, per=1)
+
+   # load up the queue
+   for url in LIST_OF_URLS:
+       rlq.put(url)
+
+   # make the calls
+   while rlq.qsize() > 0:
+       url = rlq.get()
+       make_call_to_api(url)
+       rlq.task_done()
+
+A more typical use case would be to have a pool of workers making API
+calls in parallel:
+
+.. code:: python
+
+   rlq = ratelimitqueue.RateLimitQueue(calls=3, per=2)
+   stop_flag = multiprocessing.dummy.Event()
+   n_workers = 4
+
+
+   def worker(rlq):
+       """Makes API calls on URLs from queue until it is empty."""
+       while rlq.qsize() > 0:
+           url = rlq.get()
+           make_call_to_slow_api(url)
+           rlq.task_done()
+
+   # load up the queue
+   for url in LIST_OF_URLS:
+       rlq.put(url)
+
+   # make the calls
+   with multiprocessing.dummy.Pool(n_workers, worker, (rlq,)) as pool:
+       rlq.join()
+
+Working versions of these examples can be found in the `examples
+directory <https://github.com/JohnPaton/ratelimitqueue/tree/master/examples>`__.
 
 .. |PyPI version| image:: https://badge.fury.io/py/ratelimitqueue.svg
    :target: https://badge.fury.io/py/ratelimitqueue
