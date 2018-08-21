@@ -38,7 +38,7 @@ thread.
 Installation
 ------------
 
-To install ``ratelimitqueue``, clone the repository and install with
+To install ``ratelimitqueue``, simply install it with
 ``pip``:
 
 .. code:: bash
