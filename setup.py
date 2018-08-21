@@ -7,7 +7,7 @@ with open("README.md", "r") as h:
 
 setup(
     name="ratelimitqueue",
-    version="0.2.1",
+    version="0.2.2",
     description="A thread safe, rate limited queue.",
     long_description=README,
     long_description_content_type="text/markdown",

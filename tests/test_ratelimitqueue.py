@@ -4,7 +4,7 @@ from unittest import mock
 from .utils import almost
 
 from ratelimitqueue.ratelimitqueue import RateLimitQueue, RateLimitException
-from ratelimitqueue.ratelimitqueue import RateLimitLifoQueue
+from ratelimitqueue.ratelimitqueue import RateLimitLifoQueue, RateLimitGetMixin
 from ratelimitqueue.ratelimitqueue import RateLimitPriorityQueue
 
 from queue import Empty
@@ -18,6 +18,13 @@ random.uniform = mock.Mock(side_effect=lambda a, b: a + (b - a) / 2)
 
 class GetMixinTester:
     # tests of __init__()
+    def test_no_calls(self):
+        rlq = self.QueueClass()
+        del rlq.calls
+        rlq.put(1)
+        with pytest.raises(AttributeError):
+            rlq.get()
+
     def test_no_per(self):
         rlq = self.QueueClass()
         del rlq.per
@@ -38,6 +45,20 @@ class GetMixinTester:
         rlq.put(1)
         with pytest.raises(AttributeError):
             rlq.get()
+
+    def test_no_get(self):
+        class DummyParent:
+            fuzz = 0
+            per = 0
+            calls = 0
+            _call_log = 0
+
+        class DummyChild(RateLimitGetMixin, DummyParent):
+            pass
+
+        dc = DummyChild()
+        with pytest.raises(AttributeError):
+            dc.get()
 
     def test_maxsize(self):
         rlq = self.QueueClass(0)

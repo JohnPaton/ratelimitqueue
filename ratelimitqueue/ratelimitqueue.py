@@ -5,7 +5,7 @@ import queue
 import multiprocessing.dummy as mp
 
 from .exceptions import RateLimitException
-from .utils import get_time_remaining
+from . import utils
 
 
 class RateLimitGetMixin:
@@ -43,10 +43,11 @@ class RateLimitGetMixin:
 
         """
         start = time.time()
-        self._pending_get.acquire(block, timeout if block else None)
-
         if timeout is not None and timeout < 0:
             raise ValueError("`timeout` must be a non-negative number")
+
+        # acquire lock
+        self._acquire_or_raise(self._pending_get, block, timeout)
 
         # make sure child class has the required attributes
         self._check_attributes()
@@ -65,20 +66,20 @@ class RateLimitGetMixin:
                 # sleep long enough that we don't
                 # go over the calls per unit time
                 if block:
-                    time_remaining = get_time_remaining(start, timeout)
+                    time_remaining = utils.get_time_remaining(start, timeout)
                     sleep_time = per - time_since_call
 
-                    # not enough time to sleep
+                    # not enough time to complete sleep -> exception
                     if (
                         time_remaining is not None
                         and time_remaining < sleep_time
                     ):
                         self._call_log.task_done()
                         raise RateLimitException(
-                            "Not enough time in timeout to wait for next slot"
+                            "Not enough time in timeout to wait for next item"
                         )
-
-                    time.sleep(sleep_time)
+                    else:
+                        time.sleep(sleep_time)
 
                 # too fast but not blocking -> exception
                 else:
@@ -87,29 +88,38 @@ class RateLimitGetMixin:
 
             self._call_log.task_done()
 
+        # starting to load up the queue, don't hammer gets with all allowed
+        # calls at once
         elif fuzz > 0:
-            time_remaining = get_time_remaining(start, timeout)
+            time_remaining = utils.get_time_remaining(start, timeout)
             fuzz_time = random.uniform(0, fuzz)
 
             if time_remaining is not None:
-                # leave a bit of leeway from time_remaining to not
-                # time out due to fuzzing
+                # timeout is set, so leave a bit of leeway from time_remaining
+                # to not time out due to fuzzing
                 fuzz_time = min(fuzz_time, time_remaining - 0.01)
 
             time.sleep(fuzz_time)
 
-        # get remaining timeout time for the call to put()
-        time_remaining = get_time_remaining(start, timeout)
+        # get remaining timeout time for the call to super().get()
+        time_remaining = utils.get_time_remaining(start, timeout)
 
         if time_remaining is not None and time_remaining <= 0:
             raise TimeoutError
 
-        # log the call and return the next item
+        # log the call, release the lock, and return the next item
         self._call_log.put(time.time())
         self._pending_get.release()
         return super().get(block, timeout=time_remaining)
 
     def _check_attributes(self):
+        """Check that calling object has properties calls, per, fuzz,
+        _call_log, and get()"""
+        if not hasattr(self, "calls"):
+            raise AttributeError(
+                "RateLimitGetMixin requires the `.calls` property"
+            )
+
         if not hasattr(self, "per"):
             raise AttributeError(
                 "RateLimitGetMixin requires the `.per` property"
@@ -125,11 +135,22 @@ class RateLimitGetMixin:
                 "RateLimitGetMixin requires the `._call_log` Queue"
             )
 
-        if not hasattr(super(), "put"):
+        if not hasattr(super(), "get"):
             raise AttributeError(
                 "RateLimitGetMixin must be mixed into a base class with"
                 " the `.get()` method"
             )
+
+    @staticmethod
+    def _acquire_or_raise(lock, block=True, timeout=None):
+        """Attempt to acquire `lock`, else raise RateLimitException"""
+        if block and timeout is not None:
+            locked = lock.acquire(block, timeout)
+        else:
+            locked = lock.acquire(block)
+
+        if not locked:
+            raise RateLimitException("Timed out waiting for next item")
 
 
 class RateLimitQueue(RateLimitGetMixin, queue.Queue):
@@ -208,7 +229,7 @@ class RateLimitQueue(RateLimitGetMixin, queue.Queue):
         self.fuzz = float(fuzz)
 
         self._call_log = queue.Queue(maxsize=self.calls)
-        self._pending_get = mp.Semaphore(1)
+        self._pending_get = mp.Lock()
 
 
 class RateLimitLifoQueue(RateLimitGetMixin, queue.LifoQueue):
@@ -286,7 +307,7 @@ class RateLimitLifoQueue(RateLimitGetMixin, queue.LifoQueue):
         self.fuzz = float(fuzz)
 
         self._call_log = queue.Queue(maxsize=self.calls)
-        self._pending_get = mp.Semaphore(1)
+        self._pending_get = mp.Lock()
 
 
 class RateLimitPriorityQueue(RateLimitGetMixin, queue.PriorityQueue):
@@ -370,4 +391,4 @@ class RateLimitPriorityQueue(RateLimitGetMixin, queue.PriorityQueue):
         self.fuzz = float(fuzz)
 
         self._call_log = queue.Queue(maxsize=self.calls)
-        self._pending_get = mp.Semaphore(1)
+        self._pending_get = mp.Lock()
