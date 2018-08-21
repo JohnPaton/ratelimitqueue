@@ -16,7 +16,7 @@ total calls from all your threads don’t exceed the rate limit, which
 requires some nontrivial coordination.
 
 The ``ratelimitqueue`` package extends the three built-in Python queues
-from from ``queue`` package - ``Queue``, ``LifeQueue``, and
+from from ``queue`` package - ``Queue``, ``LifoQueue``, and
 ``PriorityQueue`` - with configurable, rate limited counterparts.
 Specifically, the ``get()`` method is rate limited across all threads so
 that workers can safely consume from the queue in an unlimited loop, and
