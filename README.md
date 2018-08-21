@@ -40,7 +40,6 @@ A more typical use case would be to have a pool of workers making API calls in p
 
 ```python
 rlq = ratelimitqueue.RateLimitQueue(calls=3, per=2)
-stop_flag = multiprocessing.dummy.Event()
 n_workers = 4
 
 
@@ -51,6 +50,7 @@ def worker(rlq):
         make_call_to_slow_api(url)
         rlq.task_done()
 
+
 # load up the queue
 for url in LIST_OF_URLS:
     rlq.put(url)
@@ -58,6 +58,7 @@ for url in LIST_OF_URLS:
 # make the calls
 with multiprocessing.dummy.Pool(n_workers, worker, (rlq,)) as pool:
     rlq.join()
+
 ```
 
 Working versions of these examples can be found in the [examples directory](https://github.com/JohnPaton/ratelimitqueue/tree/master/examples).

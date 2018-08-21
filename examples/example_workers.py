@@ -14,7 +14,6 @@ def make_call_to_slow_api(url):
 LIST_OF_URLS = ["https://example.com/{}".format(i) for i in range(25)]
 
 rlq = ratelimitqueue.RateLimitQueue(calls=3, per=2)
-stop_flag = multiprocessing.dummy.Event()
 n_workers = 4
 
 
