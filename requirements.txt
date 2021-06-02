@@ -21,7 +21,7 @@ packaging==17.1
 pluggy==0.7.1
 ply==3.11
 py==1.5.4
-Pygments==2.2.0
+Pygments==2.7.4
 pyparsing==2.2.0
 pytest==3.6.4
 pytest-cov==2.5.1
