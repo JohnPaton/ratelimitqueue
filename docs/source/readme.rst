@@ -1,8 +1,8 @@
-|PyPI version| |Build Status| |Coverage Status| |Documentation Status|
-|Code style: black|
+|PyPI version| |Downloads| |Build Status| |Coverage Status|
+|Documentation Status| |Code style: black|
 
-RateLimitQueue
-==============
+🛑 RateLimitQueue
+================
 
 A rate limited wrapper for Python’s thread safe queues.
 
@@ -23,8 +23,8 @@ that workers can safely consume from the queue in an unlimited loop, and
 putting the items in the queue doesn’t need to require blocking the main
 thread.
 
-Installation
-------------
+🔌 Installation
+--------------
 
 To get started, install ``ratelimitqueue`` with ``pip``:
 
@@ -32,8 +32,8 @@ To get started, install ``ratelimitqueue`` with ``pip``:
 
    pip install ratelimitqueue
 
-Examples
---------
+🌟 Examples
+----------
 
 The most basic usage is rate limiting calls in the main thread by
 pre-loading a ``RateLimitQueue``. For a rate limit of 2 calls per
@@ -83,7 +83,10 @@ directory <https://github.com/JohnPaton/ratelimitqueue/tree/master/examples>`__.
 
 .. |PyPI version| image:: https://badge.fury.io/py/ratelimitqueue.svg
    :target: https://badge.fury.io/py/ratelimitqueue
+.. |Downloads| image:: https://pepy.tech/badge/ratelimitqueue
+   :target: https://pepy.tech/project/ratelimitqueue
 .. |Build Status| image:: https://travis-ci.com/JohnPaton/ratelimitqueue.svg?branch=master
+   :target: https://travis-ci.com/JohnPaton/ratelimitqueue
 .. |Coverage Status| image:: https://coveralls.io/repos/github/JohnPaton/ratelimitqueue/badge.svg
    :target: https://coveralls.io/github/JohnPaton/ratelimitqueue
 .. |Documentation Status| image:: https://readthedocs.org/projects/ratelimitqueue/badge/?version=latest
